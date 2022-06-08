@@ -160,7 +160,7 @@ namespace FishyFacepunch
         /// Gets the current local ConnectionState.
         /// </summary>
         /// <param name="server">True if getting ConnectionState for the server.</param>
-        public override LocalConnectionStates GetConnectionState(bool server)
+        public override LocalConnectionState GetConnectionState(bool server)
         {
             if (server)
                 return _server.GetLocalConnectionState();
@@ -171,7 +171,7 @@ namespace FishyFacepunch
         /// Gets the current ConnectionState of a remote client on the server.
         /// </summary>
         /// <param name="connectionId">ConnectionId to get ConnectionState for.</param>
-        public override RemoteConnectionStates GetConnectionState(int connectionId)
+        public override RemoteConnectionState GetConnectionState(int connectionId)
         {
             return _server.GetConnectionState(connectionId);
         }
@@ -391,13 +391,13 @@ namespace FishyFacepunch
                 Debug.LogError("Steam Facepunch not initialized. Server could not be started.");
                 return false;
             }
-            //if (_client.GetLocalConnectionState() != LocalConnectionStates.Stopped)
+            //if (_client.GetLocalConnectionState() != LocalConnectionState.Stopped)
             //{
             //    Debug.LogError("Server cannot run while client is running.");
             //    return false;
             //}
 
-            clientRunning = (_client.GetLocalConnectionState() != LocalConnectionStates.Stopped);
+            clientRunning = (_client.GetLocalConnectionState() != LocalConnectionState.Stopped);
             /* If remote _client is running then stop it
              * and start the client host variant. */
             if (clientRunning)
@@ -405,7 +405,7 @@ namespace FishyFacepunch
 #endif
 
             _server.ResetInvalidSocket();
-            if (_server.GetLocalConnectionState() != LocalConnectionStates.Stopped)
+            if (_server.GetLocalConnectionState() != LocalConnectionState.Stopped)
             {
                 Debug.LogError("Server is already running.");
                 return false;
@@ -443,15 +443,15 @@ namespace FishyFacepunch
             }
 
             //If not acting as a host.
-            if (_server.GetLocalConnectionState() == LocalConnectionStates.Stopped)
+            if (_server.GetLocalConnectionState() == LocalConnectionState.Stopped)
             {
-                if (_client.GetLocalConnectionState() != LocalConnectionStates.Stopped)
+                if (_client.GetLocalConnectionState() != LocalConnectionState.Stopped)
                 {
                     Debug.LogError("Client is already running.");
                     return false;
                 }
                 //Stop client host if running.
-                if (_clientHost.GetLocalConnectionState() != LocalConnectionStates.Stopped)
+                if (_clientHost.GetLocalConnectionState() != LocalConnectionState.Stopped)
                     _clientHost.StopConnection();
                 //Initialize.
                 InitializeRelayNetworkAccess();

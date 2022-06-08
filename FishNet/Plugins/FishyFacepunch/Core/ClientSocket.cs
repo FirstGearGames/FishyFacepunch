@@ -63,7 +63,7 @@ namespace FishyFacepunch.Client
             SteamNetworkingSockets.OnConnectionStatusChanged += OnConnectionStatusChanged;
             ConnectionTimeout = TimeSpan.FromSeconds(Math.Max(1, base.Transport.GetTimeout(false)));
 
-            SetLocalConnectionState(LocalConnectionStates.Starting, false);
+            SetLocalConnectionState(LocalConnectionState.Starting, false);
 
             try
             {
@@ -96,28 +96,28 @@ namespace FishyFacepunch.Client
                                 Debug.LogError($"Connection to {address} timed out.");
                             StopConnection();
                         }
-                        SetLocalConnectionState(LocalConnectionStates.Stopped, false);
+                        SetLocalConnectionState(LocalConnectionState.Stopped, false);
                     }
                 }
                 else
                 {
                     if (base.Transport.NetworkManager.CanLog(LoggingType.Error))
                         Debug.LogError("SteamWorks not initialized");
-                    SetLocalConnectionState(LocalConnectionStates.Stopped, false);
+                    SetLocalConnectionState(LocalConnectionState.Stopped, false);
                 }
             }
             catch (FormatException)
             {
                 if (base.Transport.NetworkManager.CanLog(LoggingType.Error))
                     Debug.LogError($"Connection string was not in the right format. Did you enter a SteamId?");
-                SetLocalConnectionState(LocalConnectionStates.Stopped, false);
+                SetLocalConnectionState(LocalConnectionState.Stopped, false);
                 _Error = true;
             }
             catch (Exception ex)
             {
                 if (base.Transport.NetworkManager.CanLog(LoggingType.Error))
                     Debug.LogError(ex.Message);
-                SetLocalConnectionState(LocalConnectionStates.Stopped, false);
+                SetLocalConnectionState(LocalConnectionState.Stopped, false);
                 _Error = true;
             }
             finally
@@ -126,7 +126,7 @@ namespace FishyFacepunch.Client
                 {
                     if (base.Transport.NetworkManager.CanLog(LoggingType.Error))
                         Debug.LogError("Connection failed.");
-                    SetLocalConnectionState(LocalConnectionStates.Stopped, false);
+                    SetLocalConnectionState(LocalConnectionState.Stopped, false);
                 }
             }
         }
@@ -138,7 +138,7 @@ namespace FishyFacepunch.Client
         {
             if (info.State == ConnectionState.Connected)
             {
-                SetLocalConnectionState(LocalConnectionStates.Started, false);
+                SetLocalConnectionState(LocalConnectionState.Started, false);
                 connectedComplete.SetResult(connectedComplete.Task);
             }
             else if (info.State == ConnectionState.ClosedByPeer || info.State == ConnectionState.ProblemDetectedLocally)
@@ -159,10 +159,10 @@ namespace FishyFacepunch.Client
         /// </summary>
         internal bool StopConnection()
         {
-            if (base.GetLocalConnectionState() == LocalConnectionStates.Stopped || base.GetLocalConnectionState() == LocalConnectionStates.Stopping)
+            if (base.GetLocalConnectionState() == LocalConnectionState.Stopped || base.GetLocalConnectionState() == LocalConnectionState.Stopping)
                 return false;
 
-            SetLocalConnectionState(LocalConnectionStates.Stopping, false);
+            SetLocalConnectionState(LocalConnectionState.Stopping, false);
 
             cancelToken?.Cancel();
 
@@ -177,7 +177,7 @@ namespace FishyFacepunch.Client
                 HostConnectionManager = null;
             }
 
-            SetLocalConnectionState(LocalConnectionStates.Stopped, false);
+            SetLocalConnectionState(LocalConnectionState.Stopped, false);
 
             return true;
         }
@@ -187,7 +187,7 @@ namespace FishyFacepunch.Client
         /// </summary>
         internal void IterateIncoming()
         {
-            if (base.GetLocalConnectionState() != LocalConnectionStates.Started)
+            if (base.GetLocalConnectionState() != LocalConnectionState.Started)
                 return;
 
             HostConnectionManager.Receive(MAX_MESSAGES);
@@ -206,7 +206,7 @@ namespace FishyFacepunch.Client
         /// <param name="segment"></param>
         internal void SendToServer(byte channelId, ArraySegment<byte> segment)
         {
-            if (base.GetLocalConnectionState() != LocalConnectionStates.Started)
+            if (base.GetLocalConnectionState() != LocalConnectionState.Started)
                 return;
 
             Result res = base.Send(HostConnection, segment, channelId);
@@ -228,7 +228,7 @@ namespace FishyFacepunch.Client
         /// </summary>
         internal void IterateOutgoing()
         {
-            if (base.GetLocalConnectionState() != LocalConnectionStates.Started)
+            if (base.GetLocalConnectionState() != LocalConnectionState.Started)
                 return;
 
             HostConnection.Flush();
