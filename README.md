@@ -14,7 +14,7 @@ Both of these projects need to be installed and working before you can use this 
 ## Setting Up
 
 1. Install Fish-Net from the **[official repo](https://github.com/FirstGearGames/FishNet/releases)** or **[Asset Store](https://assetstore.unity.com/packages/tools/network/fish-net-networking-evolved-207815)**.
-2. Install FishyFacepunch **[unitypackage](https://github.com/TiToMoskito/FishyFacepunch/releases)** from the release section.
+2. Install FishyFacepunch **[unitypackage](https://github.com/FirstGearGames/FishyFacepunch/releases)** from the release section.
 3. In your **"NetworkManager"** object add a  **"Transport Manager"** script and the **"FishyFacepunch"** script.
 4. Enter your Steam App ID in the **"FishyFacepunch"** script and set all settings to your needs.
 
