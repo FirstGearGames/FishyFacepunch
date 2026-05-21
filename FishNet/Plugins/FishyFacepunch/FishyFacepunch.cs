@@ -95,12 +95,30 @@ namespace FishyFacepunch
             CreateChannelData();
 
 #if !UNITY_SERVER
-            if (!SteamClient.IsValid) //Steam might have already been initialized by something else
+            // Facepunch's SteamClient.Init throws when Steam is unavailable on the
+            // player's machine (e.g. the Steam client is mid-startup or reports
+            // "ConnectToGlobalUser failed"). FishNet runs this transport's Initialize
+            // inside NetworkManager.Awake (NetworkManager is DefaultExecutionOrder
+            // short.MinValue, so it precedes every other script). An uncaught throw
+            // here aborts NetworkManager.Awake, leaving every FishNet manager
+            // half-built and flooding the log with PredictionManager NREs each tick.
+            // Facepunch documents that callers of SteamClient.Init must catch this —
+            // so catch it: the transport comes up Steam-less and the game still
+            // boots. Steam-backed connections are unavailable, which is correct when
+            // Steam is down.
+            try
             {
-                SteamClient.Init(_steamAppID, true);
-            }
+                if (!SteamClient.IsValid) //Steam might have already been initialized by something else
+                {
+                    SteamClient.Init(_steamAppID, true);
+                }
 
-            SteamNetworking.AllowP2PPacketRelay(true);
+                SteamNetworking.AllowP2PPacketRelay(true);
+            }
+            catch (Exception e)
+            {
+                UnityEngine.Debug.LogError($"[FishyFacepunch] Steam initialization failed; Steam transport is unavailable this session. {e.Message}");
+            }
 #endif
             _clientHost.Initialize(this);
             _client.Initialize(this);
